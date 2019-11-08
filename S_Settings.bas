@@ -1,54 +1,10 @@
 Attribute VB_Name = "S_Settings"
-Public Declare PtrSafe Sub Sleep Lib "kernel32" (ByVal dwMilliseconds As LongPtr)
-Public skeletal1 As Range
-Public skeletal2 As Range
-Public skeletal3 As Range
-Public skeletal4 As Range
-Public skeletal5 As Range
-Public skeletal6 As Range
-Public skeletal7 As Range
-
-Public fantomas As Range
-Public fantomas2 As Range
-Public fantomas3 As Range
-
-Public anim1 As Range
-Public anim2 As Range
-
-Public pahar1 As Range
-Public pahar2 As Range
-Public pahar3 As Range
-
-Public para1 As Range
-Public para2 As Range
-Public para3 As Range
-
-Public beer1 As Range
-Public beer2 As Range
-Public beer3 As Range
-
-Public cola1 As Range
-Public cola2 As Range
-Public cola3 As Range
-
-Public cig1 As Range
-Public cig2 As Range
-Public cig3 As Range
-
-Public ochi1 As Range
-Public ochi2 As Range
-
-Public mobs(1 To 15) As Range
-
-Public anim As Range
-Public waitfortalk As Integer
-Public waitformouth As Integer
-Public waitforeyes As Integer
-Public waitformove As Integer
-Public noMobs As Integer
-Public u As Integer
-
 Sub Settings()
+
+For fu = 0 To noMobs - 1
+    Set prevColl(fu) = New Dictionary
+Next fu
+
 Set skeletal1 = Sheets(2).Range("M4:AE20")
 Set skeletal2 = Sheets(2).Range("M22:AE39")
 Set skeletal3 = Sheets(2).Range("M41:AE59")
@@ -92,6 +48,7 @@ Set mobs(7) = Sheets(2).Range("FK4:GE24")
 Set mobs(8) = Sheets(2).Range("FK27:GE47")
 Set mobs(9) = Sheets(2).Range("FK49:GE69")
 
+'numarul de mobi e salvat aici
 u = Sheets(1).Range("A2").Value
 
 Set ochi1 = Sheets(1).Range("N12:O12")

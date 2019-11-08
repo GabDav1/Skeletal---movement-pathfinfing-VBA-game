@@ -1,9 +1,6 @@
 Attribute VB_Name = "Objects_Move"
 Sub SkelMove(nmbs As Integer, toPointx As Integer, toPointy As Integer, iterator As Variant)
 
-Dim randnum As Integer
-Dim temp As Range
-
 'SETAREA TRAIECTORIEI PAREI IN FUNCTIE DE POZITIA FANTOMEI IN 4 CAZURI POSIBILE - CELE 4 CADRANE INCONJURATOARE ALE PAREI
 xs = toPointx
 ys = toPointy
@@ -27,22 +24,22 @@ End If
 
 'Stabilirea cadrului actual de animatie
 If iterator Mod 3 = 0 Then
-    Set temp = mobs(1 + nmbs * 3)
+    Set tempAnim = mobs(1 + nmbs * 3)
 ElseIf iterator Mod 3 = 1 Then
-    Set temp = mobs(2 + nmbs * 3)
-Else: Set temp = mobs(3 + nmbs * 3)
+    Set tempAnim = mobs(2 + nmbs * 3)
+Else: Set tempAnim = mobs(3 + nmbs * 3)
 End If
 
 'Desenarea cadrelor in functie de directia stabilita
 Select Case randnum
     Case 1
-        Call moveloop(nmbs, 1, -1, temp)
+        Call moveloop(nmbs, 1, -1, tempAnim)
     Case 2
-        Call moveloop(nmbs, 1, 1, temp)
+        Call moveloop(nmbs, 1, 1, tempAnim)
     Case 3
-        Call moveloop(nmbs, -1, -1, temp)
+        Call moveloop(nmbs, -1, -1, tempAnim)
     Case 4
-        Call moveloop(nmbs, -1, 1, temp)
+        Call moveloop(nmbs, -1, 1, tempAnim)
 End Select
 
 'Scrierea coordonatelor pentru cadrul urmator
@@ -52,14 +49,6 @@ Range("D3").Offset(0, 2 * nmbs).Value = anim.Column
 End Sub
 
 Sub moveloop(nmbs As Integer, x As Integer, y As Integer, z As Range)
-Dim pozVerf As Range
-Dim isRight As Boolean
-Dim isLeft As Boolean
-Dim isDown As Boolean
-Dim isUp As Boolean
-Dim isBlocked As Boolean
-Dim prevnumX As Integer
-Dim prevnumY As Integer
 
 prevnumX = Sheets(1).Range("E2").Offset(0, 2 * nmbs).Value
 prevnumY = Sheets(1).Range("F2").Offset(0, 2 * nmbs).Value
@@ -73,10 +62,7 @@ isDown = False
 isUp = False
 isBlocked = False
 
-'TODO : de facut mecanism STATISTIC de deplasare: toate celulele care au fost vizitate sunt memorate si primesc rating:
-' cu cat sunt vizitate mai des, cu atat ratingul creste. Cu cat ratingul e mai ridicat cu atat sunt mai mici sansele de a fi vizitata din nou.
-
-Set pozVerf = anim.Offset(x, y)
+'Set pozVerf = anim.Offset(x, y)
 'Verificam daca pozitiile deasupra, stanga, dreapta si jos sunt libere
 'Deasupra
 If anim.Offset(-1, 0).Interior.Color <> rgbWhite Or anim.Offset(-1, z.Columns.Count).Interior.Color <> rgbWhite Or _
@@ -103,40 +89,121 @@ If isBlocked Then
     Dim direction As Integer
     
     'Alegem intre sus si jos in functie de coordonata x a destinatiei
-    If isUp = False And isDown = False And x = -1 Then
+    If isUp = False And x = -1 Then
+    'If isUp = False And isDown = False And x = -1 Then
         coll.Add anim.Offset(-1, 0)
-    ElseIf isUp = False And isDown = False And x = 1 Then
+    ElseIf isDown = False And x = 1 Then
+    'ElseIf isUp = False And isDown = False And x = 1 Then
         coll.Add anim.Offset(1, 0)
     Else:
-    'Verificam daca directia de deplasare e libera si NU e aceeasi cu directia precedenta
-        If isUp = False And anim.Offset(-1, 0).Row <> prevnumX And anim.Offset(-1, 0).Column <> prevnumY Then coll.Add anim.Offset(-1, 0)
-        If isDown = False And anim.Offset(1, 0).Row <> prevnumX And anim.Offset(1, 0).Column <> prevnumY Then coll.Add anim.Offset(1, 0)
+    'Verificam daca directia de deplasare e libera
+       'If isUp = False Then coll.Add anim.Offset(-1, 0)
+       'If isDown = False Then coll.Add anim.Offset(1, 0)
     End If
     'Alegem intre stanga si dreapta in functie de coordonata y a destinatiei
-    If isLeft = False And isRight = False And y = -1 Then
+    If isLeft = False And y = -1 Then
+    'If isLeft = False And isRight = False And y = -1 Then
         coll.Add anim.Offset(0, -1)
-    ElseIf isLeft = False And isRight = False And y = 1 Then
+    ElseIf isRight = False And y = 1 Then
+    'ElseIf isLeft = False And isRight = False And y = 1 Then
         coll.Add anim.Offset(0, 1)
     Else:
-    'Verificam daca directia de deplasare e libera si NU e aceeasi cu directia precedenta
-        If isLeft = False And anim.Offset(0, -1).Row <> prevnumX And anim.Offset(0, -1).Column <> prevnumY Then coll.Add anim.Offset(0, -1)
-        If isRight = False And anim.Offset(0, 1).Row <> prevnumX And anim.Offset(0, 1).Column <> prevnumY Then coll.Add anim.Offset(0, 1)
+    'Verificam daca directia de deplasare e libera
+        'If isLeft = False Then coll.Add anim.Offset(0, -1)
+        'If isRight = False Then coll.Add anim.Offset(0, 1)
     End If
     
     Randomize
     direction = Int(Rnd * coll.Count) + 1
     If coll.Count <> 0 Then
-    'TODO: INCA O COLECTIE CU TOATE POZITIILE PRECEDENTE SETATA AICI, COLECTIA ASTA VA FI FOLOSITA IN LOC DE PREVNUMX SI PREVNUMY
-        Set anim = coll(direction)
+        Set tEmp = coll(direction)
     Else:
-        'Sa mearga in directia opusa daca nu a gasit nici o directie valabila
-        Set anim = anim.Offset(-x, -y)
+        'Sa stea pe loc
+        Set tEmp = Cells(prevnumX, prevnumY)
     End If
     
-Else: Set anim = anim.Offset(x, y)
+Else: Set tEmp = anim.Offset(x, y)
+End If
+
+'Cazul in care cadrul stabilit a fost parcurs deja: una din pozitiile libere daca nu a fost parcursa deja
+If prevColl(nmbs).Exists(CStr(tEmp.Row) & CStr(tEmp.Column)) Then
+
+    'incrementam valoarea celulelor deja parcurse
+    prevColl(nmbs)(CStr(tEmp.Row) & CStr(tEmp.Column)) = prevColl(nmbs)(CStr(tEmp.Row) & CStr(tEmp.Column)) + 1
+
+    valeft = 0
+    varight = 0
+    vaup = 0
+    vadown = 0
+
+    'Daca directia e disponibila primeste o evaluare, altfel ramane cu 0
+    If isLeft = False And evalPos(prevColl(nmbs)(CStr(anim.Offset(0, -1).Row) & CStr(anim.Offset(0, -1).Column))) > 0 Then
+        'coll.Add anim.Offset(0, -1)
+        valeft = evalPos(prevColl(nmbs)(CStr(anim.Offset(0, -1).Row) & CStr(anim.Offset(0, -1).Column)))
+    End If
+'    'If isLeft = False And Not (prevColl.Exists(anim.Offset(0, -1))) Then coll.Add anim.Offset(0, -1)
+    If isRight = False And evalPos(prevColl(nmbs)(CStr(anim.Offset(0, 1).Row) & CStr(anim.Offset(0, 1).Column))) > 0 Then
+        'coll.Add anim.Offset(0, 1)
+        varight = evalPos(prevColl(nmbs)(CStr(anim.Offset(0, 1).Row) & CStr(anim.Offset(0, 1).Column)))
+    End If
+'    'If isLeft = False And Not (prevColl.Exists(anim.Offset(0, 1))) Then coll.Add anim.Offset(0, 1)
+    If isUp = False And evalPos(prevColl(nmbs)(CStr(anim.Offset(-1, 0).Row) & CStr(anim.Offset(-1, 0).Column))) > 0 Then
+        'coll.Add anim.Offset(-1, 0)
+        vaup = evalPos(prevColl(nmbs)(CStr(anim.Offset(-1, 0).Row) & CStr(anim.Offset(-1, 0).Column)))
+    End If
+'    'If isLeft = False And Not (prevColl.Exists(anim.Offset(-1, 0))) Then coll.Add anim.Offset(-1, 0)
+    If isDown = False And evalPos(prevColl(nmbs)(CStr(anim.Offset(1, 0).Row) & CStr(anim.Offset(1, 0).Column))) > 0 Then
+        'coll.Add anim.Offset(1, 0)
+        vadown = evalPos(prevColl(nmbs)(CStr(anim.Offset(1, 0).Row) & CStr(anim.Offset(1, 0).Column)))
+    End If
+'    'If isLeft = False And Not (prevColl.Exists(anim.Offset(1, 0))) Then coll.Add anim.Offset(1, 0)
+
+    vatotal = valeft + varight + vaup + vadown
+    Randomize
+    direction = Int(Rnd * vatotal) + 1
+
+    If valeft <> 0 And direction <= valeft Then
+        Set anim = anim.Offset(0, -1)
+        'MsgBox "left"
+        nbtest = valeft
+    ElseIf varight <> 0 And direction <= valeft + varight And direction > valeft Then
+        Set anim = anim.Offset(0, 1)
+        'MsgBox "right"
+        nbtest = varight
+    ElseIf vaup <> 0 And direction <= valeft + varight + vaup And direction > valeft + varight Then
+        Set anim = anim.Offset(-1, 0)
+        'MsgBox "up"
+        nbtest = vaup
+    ElseIf vadown <> 0 And direction <= valeft + varight + vaup + vadown And direction > valeft + varight + vaup Then
+        Set anim = anim.Offset(1, 0)
+        'MsgBox "down"
+        nbtest = vadown
+    End If
+Else:
+    Set anim = tEmp
+End If
+
+'lasarea unei urme pe alta foaie
+Set anim2 = Sheets(3).Cells(anim.Row, anim.Column)
+anim2.Interior.Color = RGB(0, 0, nmbs * 50)
+anim2.Value = nbtest
+
+'Odata ce cadrul a fost desenat, ii adaugam si pozitia in dictionar
+If Not prevColl(nmbs).Exists(CStr(anim.Row) & CStr(anim.Column)) Then
+    'prevColl.Add CStr(anim.Row) & CStr(anim.Column), anim
+    prevColl(nmbs).Add CStr(anim.Row) & CStr(anim.Column), 0
 End If
 
 Sheets(1).Range("E2").Offset(0, 2 * nmbs).Value = anim.Row
 Sheets(1).Range("F2").Offset(0, 2 * nmbs).Value = anim.Column
 
 End Sub
+
+Function evalPos(nrParc As Integer)
+'mecanismul statistic de deplasare, sa-l schimb cu un model exponential? TODO o chestie mai desteapta de stabilire a directiei
+If nrParc <= 3 Then
+    evalPos = (3 - nrParc) ^ (3 - nrParc)
+Else: evalPos = 0
+End If
+
+End Function
