@@ -1,0 +1,9 @@
+
+Could add a check for "is the line(between ghost and follower) interrupted?" 
+Do other stuff while the line is interrupted :)
+
+TODO: Terrain generation and mob placement on OpenDoc
+TODO: call skelMove on MouseClick
+TODO: treat traversed cells as a wall after a number of prevColls(eg if prevcolls is 5, transform them into a wall)
+
+
